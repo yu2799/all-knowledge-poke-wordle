@@ -199,7 +199,7 @@ type Data = {
 };
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const res = await fetch("http://localhost:3000/pokemon.json");
+  const res = await fetch(`${process.env.SITE}/pokemon.json`);
   const data: Data = await res.json();
   const nameSet: string[][] = Object.values(data).map(({ jaName, enName }) => [
     jaName,
