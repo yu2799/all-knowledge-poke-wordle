@@ -8,7 +8,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { SettingsDialog } from "./SettingDialog";
 import CatchingPokemonIcon from "@mui/icons-material/CatchingPokemon";
 
-export const Header: FC = memo((): JSX.Element => {
+export const Header: FC = (): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
 
   const handleClick = useCallback((): void => setOpen((prev) => !prev), []);
@@ -30,4 +30,4 @@ export const Header: FC = memo((): JSX.Element => {
       <SettingsDialog open={open} onClose={handleClick} />
     </AppBar>
   );
-});
+};

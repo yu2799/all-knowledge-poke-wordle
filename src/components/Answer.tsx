@@ -6,7 +6,7 @@ type Props = {
   res: string[][][];
 };
 
-export const Answer: FC<Props> = memo(({ res }): JSX.Element => {
+export const Answer: FC<Props> = ({ res }): JSX.Element => {
   return (
     <Box
       sx={{
@@ -42,4 +42,4 @@ export const Answer: FC<Props> = memo(({ res }): JSX.Element => {
       </Stack>
     </Box>
   );
-});
+};
