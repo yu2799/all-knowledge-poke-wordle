@@ -10,6 +10,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Image from "next/image";
 import { Typography } from "@mui/material";
+import DATA from "../../public/pokemon.json";
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -191,17 +192,17 @@ type Data = {
     spDef: number;
     speed: number;
     avi1: string;
-    avi2?: string;
-    avi3?: string;
+    avi2: string | null;
+    avi3: string | null;
     type1: string;
-    type2?: string;
+    type2: string | null;
   };
 };
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const res = await fetch(`${process.env.SITE}/pokemon.json`);
-  console.log(process.env.SITE);
-  const data: Data = await res.json();
+  // const res = await fetch(`${process.env.SITE}/pokemon.json`);
+  // const data: Data = await res.json();
+  const data: Data = DATA;
   const nameSet: string[][] = Object.values(data).map(({ jaName, enName }) => [
     jaName,
     enName,
