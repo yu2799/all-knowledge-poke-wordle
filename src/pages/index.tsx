@@ -200,7 +200,7 @@ type Data = {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const res = await fetch(`${process.env.SITE}/pokemon.json`);
-  console.log(res);
+  console.log(process.env.SITE);
   const data: Data = await res.json();
   const nameSet: string[][] = Object.values(data).map(({ jaName, enName }) => [
     jaName,
