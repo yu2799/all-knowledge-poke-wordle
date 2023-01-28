@@ -169,10 +169,8 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   return (
     <Box
       sx={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
         backgroundColor: "snow",
+        pb: 4,
       }}
     >
       <Header />
