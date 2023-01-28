@@ -84,7 +84,7 @@ export const Keyboard: FC<Props> = ({
           variant="outlined"
           color="warning"
           onClick={onClickHint}
-          disabled={hintCnt === 0}
+          disabled={hintCnt <= 0}
         >
           {`HINT : ${hintCnt}`}
           <LightbulbIcon fontSize="small" />

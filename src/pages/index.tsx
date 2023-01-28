@@ -9,8 +9,9 @@ import Container from "@mui/material/Container";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Image from "next/image";
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import DATA from "../../public/pokemon.json";
+import { HintDisplay } from "../components/HintDisplay";
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -24,6 +25,59 @@ const searchImg = async (name: string): Promise<string> => {
   const res = await response.json();
   const sprites = res["sprites"];
   return sprites["front_shiny"] || sprites["front_default"];
+};
+const searchHint = async (name: string): Promise<string[]> => {
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}/`);
+  const res = await response.json();
+  const text: string[] = ["", "", ""];
+  const num: number = Math.floor(Math.random() * 3);
+  // 最も高い種族値
+  if (num === 0) {
+    let hStat: string = "";
+    let hVal = 0;
+    for (const { base_stat, stat } of res["stats"]) {
+      if (hVal < base_stat) {
+        hStat = stat["name"];
+        hVal = base_stat;
+      }
+    }
+    const txtMap: { [key: string]: string } = {
+      hp: "たいりょく",
+      attack: "こうげき",
+      defense: "ぼうぎょ",
+      "special-attack": "とくこう",
+      "special-defense": "とくぼう",
+      speed: "すばやさ",
+    };
+    text[0] = "最も高い種族値は";
+    text[1] = `${txtMap[hStat]} の ${hVal}`;
+    text[2] = "です";
+  } else {
+    const typeMap: { [key: string]: string } = {
+      normal: "ノーマル",
+      fire: "ほのお",
+      water: "みず",
+      grass: "くさ",
+      electric: "でんき",
+      ice: "こおり",
+      fighting: "かくとう",
+      poison: "どく",
+      ground: "じめん",
+      flying: "ひこう",
+      psychic: "エスパー",
+      bug: "むし",
+      rock: "いわ",
+      ghost: "ゴースト",
+      dragon: "ドラゴン",
+      dark: "あく",
+      steel: "はがね",
+      fairy: "フェアリー",
+    };
+    text[0] = "このポケモンのタイプには";
+    text[1] = `${typeMap[res["types"][0]["type"]["name"]]} タイプ`;
+    text[2] = "が含まれています";
+  }
+  return text;
 };
 
 const MAX_LENGTH: number = 6;
@@ -46,7 +100,8 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
   const [pokeImg, setPokeImg] = useState<string>("");
   const [isAnimation, setAnimation] = useState<boolean>(false);
-  const [hintCnt, setHintCnt] = useState<number>(3);
+  const [hintCnt, setHintCnt] = useState<number>(1);
+  const [hintData, setHintData] = useState<string[]>([]);
 
   const onClickAnswer = async (
     e: MouseEvent<HTMLButtonElement>
@@ -121,19 +176,10 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   const onClickHint = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     if (!res || isAnimation) return;
-
-    for (const { jaName, hp, atk, def, spAtk, spDef, speed } of Object.values(
-      DATA
-    )) {
-      if (jaName === theme) {
-        const tmp = { hp, atk, def, spAtk, spDef, speed };
-        let max = 0;
-        let maxName = "";
-        for (const [key, val] of Object.entries(tmp)) {
-        }
-      }
-    }
-    setHintCnt((prev) => prev - 1);
+    searchHint(nameMap[theme].toLowerCase()).then((res) => {
+      setHintData(res);
+      setHintCnt(0);
+    });
   };
 
   const init = (): void => {
@@ -155,6 +201,8 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
       )
     );
     setCapState(obj);
+    setHintCnt(1);
+    setHintData([]);
   };
 
   useEffect(init, []);
@@ -176,7 +224,15 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
       <Header />
       {theme && res && (
         <Container>
-          <Answer res={res} />
+          <Grid container spacing={2}>
+            <Grid item xs={4} />
+            <Grid item xs={4}>
+              <Answer res={res} />
+            </Grid>
+            <Grid item xs={4}>
+              <HintDisplay data={hintData} />
+            </Grid>
+          </Grid>
           <Keyboard
             onClickInput={onClickInput}
             onClickAnswer={onClickAnswer}
