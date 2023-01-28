@@ -5,14 +5,15 @@ import Stack from "@mui/material/Stack";
 import { KEY_ALIGN_NOMAL, KEY_ALIGN_SPECIAL } from "../const/KeyAlign";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import LoopIcon from "@mui/icons-material/Loop";
-import EmojiFlagsIcon from "@mui/icons-material/EmojiFlags";
 
 type Props = {
   onClickInput: (event: MouseEvent<HTMLButtonElement>) => void;
   onClickAnswer: (event: MouseEvent<HTMLButtonElement>) => void;
   onClickDelete: (event: MouseEvent<HTMLButtonElement>) => void;
   onClickDeleteAll: (event: MouseEvent<HTMLButtonElement>) => void;
+  onClickHint: (event: MouseEvent<HTMLButtonElement>) => void;
   capState: { [key: string]: string };
+  hintCnt: number;
 };
 
 export const Keyboard: FC<Props> = ({
@@ -20,7 +21,9 @@ export const Keyboard: FC<Props> = ({
   onClickAnswer,
   onClickDelete,
   onClickDeleteAll,
+  onClickHint,
   capState,
+  hintCnt,
 }): JSX.Element => {
   const [isUpper, setIsUpper] = useState<boolean>(true);
 
@@ -80,9 +83,10 @@ export const Keyboard: FC<Props> = ({
         <Button
           variant="outlined"
           color="warning"
-          onClick={() => setIsUpper((prev) => !prev)}
+          onClick={onClickHint}
+          disabled={hintCnt === 0}
         >
-          HINT
+          {`HINT : ${hintCnt}`}
           <LightbulbIcon fontSize="small" />
         </Button>
         {/* <IconButton sx={{ color: "darkred" }} onClick={onClickDelete}>

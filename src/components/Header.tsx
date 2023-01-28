@@ -4,12 +4,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import HelpIcon from "@mui/icons-material/HelpOutline";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { SettingsDialog } from "./SettingDialog";
+// import SettingsIcon from "@mui/icons-material/Settings";
+import { InfoDialog } from "./InfoDialog";
 import CatchingPokemonIcon from "@mui/icons-material/CatchingPokemon";
 
 export const Header: FC = (): JSX.Element => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(true);
 
   const handleClick = useCallback((): void => setOpen((prev) => !prev), []);
 
@@ -21,13 +21,13 @@ export const Header: FC = (): JSX.Element => {
           Pokemon Wordle
         </Typography>
         <IconButton color="inherit" onClick={handleClick}>
-          <SettingsIcon />
-        </IconButton>
-        <IconButton color="inherit">
           <HelpIcon />
         </IconButton>
+        {/* <IconButton color="inherit">
+          <SettingsIcon />
+        </IconButton> */}
       </Toolbar>
-      <SettingsDialog open={open} onClose={handleClick} />
+      <InfoDialog open={open} onClose={handleClick} />
     </AppBar>
   );
 };

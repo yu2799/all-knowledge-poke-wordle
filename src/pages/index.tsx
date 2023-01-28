@@ -42,21 +42,25 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   const [step, setStep] = useState<number>(0);
   const [res, setRes] = useState<string[][][] | null>(null);
   const [capState, setCapState] = useState<{ [key: string]: string }>({});
-  const [maxPlay, setMaxPlay] = useState<number>(8);
+  const [maxPlay, setMaxPlay] = useState<number>(6);
   const [open, setOpen] = useState<boolean>(false);
   const [pokeImg, setPokeImg] = useState<string>("");
+  const [isAnimation, setAnimation] = useState<boolean>(false);
+  const [hintCnt, setHintCnt] = useState<number>(3);
 
   const onClickAnswer = async (
     e: MouseEvent<HTMLButtonElement>
   ): Promise<void> => {
     e.preventDefault();
-    if (!res) return;
+    if (!res || isAnimation) return;
 
+    setAnimation(true);
     const tmp = [];
     for (let i = 0; i < MAX_LENGTH; ++i) tmp.push(res[step][i][0]);
     const buf = tmp.join("").trim();
     if (!nameMap[buf]) {
       alert("存在しません");
+      setAnimation(false);
       return;
     }
     setStep((prev) => prev + 1);
@@ -82,11 +86,12 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
           .then(() => setOpen(true));
         init();
       }
+      setAnimation(false);
     });
   };
   const onClickInput = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if (!res) return;
+    if (!res || isAnimation) return;
 
     const chr: string = e.currentTarget.value;
     const idx: number = searchElement(res[step], "");
@@ -97,7 +102,7 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   };
   const onClickDelete = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if (!res) return;
+    if (!res || isAnimation) return;
 
     const idx: number = searchElement(res[step], "");
     if (idx !== 0) {
@@ -107,11 +112,28 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
   };
   const onClickDeleteAll = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if (!res) return;
+    if (!res || isAnimation) return;
 
     const idx: number = searchElement(res[step], "");
     for (let i = 0; i < idx; ++i) res[step][i][0] = "";
     setRes(res.slice());
+  };
+  const onClickHint = (e: MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    if (!res || isAnimation) return;
+
+    for (const { jaName, hp, atk, def, spAtk, spDef, speed } of Object.values(
+      DATA
+    )) {
+      if (jaName === theme) {
+        const tmp = { hp, atk, def, spAtk, spDef, speed };
+        let max = 0;
+        let maxName = "";
+        for (const [key, val] of Object.entries(tmp)) {
+        }
+      }
+    }
+    setHintCnt((prev) => prev - 1);
   };
 
   const init = (): void => {
@@ -124,6 +146,7 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
     }
     const theme: string =
       data[Math.floor(Math.random() * Object.keys(nameMap).length) + 1][0];
+    console.log(theme);
     setTheme(theme);
     setStep(0);
     setRes(
@@ -136,6 +159,13 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
 
   useEffect(init, []);
 
+  useEffect(() => {
+    if (step >= maxPlay && !isAnimation) {
+      alert(`答えは${theme}でした。`);
+      init();
+    }
+  }, [isAnimation]);
+
   return (
     <Box
       sx={{
@@ -146,7 +176,6 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
       }}
     >
       <Header />
-      {`お題：${theme}`}
       {theme && res && (
         <Container>
           <Answer res={res} />
@@ -155,7 +184,9 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
             onClickAnswer={onClickAnswer}
             onClickDelete={onClickDelete}
             onClickDeleteAll={onClickDeleteAll}
+            onClickHint={onClickHint}
             capState={capState}
+            hintCnt={hintCnt}
           />
         </Container>
       )}
@@ -164,8 +195,16 @@ const Home: NextPage<Props> = ({ data }): JSX.Element => {
         onClose={() => setOpen(false)}
         autoHideDuration={8000}
       >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>+10点</Typography>
+        <Alert
+          severity="success"
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography textAlign="center">{`+${10 - step}点`}</Typography>
           <Image
             src={pokeImg}
             alt="お題ポケモンの画像"
